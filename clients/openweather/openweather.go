@@ -4,6 +4,7 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
+	"log"
 	"net/http"
 )
 
@@ -20,6 +21,7 @@ func (o OpenWeatherClient) Coordinates(city string) (Coordinates, error) {
 
 	resp, err := http.Get(fmt.Sprintf(url, city, o.apiKey))
 	if err != nil {
+		log.Println(err)
 		return Coordinates{}, fmt.Errorf("error get coordinates: %w", err)
 	}
 
@@ -30,6 +32,7 @@ func (o OpenWeatherClient) Coordinates(city string) (Coordinates, error) {
 	var coordinatesResponse []CoordinatesResponse
 	err = json.NewDecoder(resp.Body).Decode(&coordinatesResponse)
 	if err != nil {
+		log.Println(err)
 		return Coordinates{}, fmt.Errorf("error decode coordinates: %w", err)
 	}
 	if len(coordinatesResponse) == 0 {
@@ -46,6 +49,8 @@ func (o OpenWeatherClient) Weather(lat, lon float64) (Weather, error) {
 	url := "https://api.openweathermap.org/data/2.5/weather?lat=%f&lon=%f&appid=%s&units=metric"
 	resp, err := http.Get(fmt.Sprintf(url, lat, lon, o.apiKey))
 	if err != nil {
+		log.Println(err)
+
 		return Weather{}, fmt.Errorf("error get locations: %w", err)
 	}
 
@@ -56,6 +61,7 @@ func (o OpenWeatherClient) Weather(lat, lon float64) (Weather, error) {
 	var weatherResponse WeatherResponse
 	err = json.NewDecoder(resp.Body).Decode(&weatherResponse)
 	if err != nil {
+		log.Println(err)
 		return Weather{}, fmt.Errorf("error unmarshal weather response: %w", err)
 	}
 

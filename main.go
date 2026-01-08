@@ -29,12 +29,6 @@ func main() {
 
 	botHandlaer := handler.New(bot, owClient)
 
-	u := tgbotapi.NewUpdate(0)
-	u.Timeout = 60
+	botHandlaer.Start()
 
-	updates := bot.GetUpdatesChan(u)
-
-	for update := range updates {
-		botHandlaer.HandUpdate(update)
-	}
 }

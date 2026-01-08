@@ -77,8 +77,8 @@ func (h *Handler) handleWeatherCommand(update tgbotapi.Update) {
 
 	weather, err := h.owClient.Weather(coordinates.Lat, coordinates.Lon)
 	if err != nil {
-		log.Printf(err)
-		msg := tgbotapi.NewMessage(update.Message.Chat.ID, "Не смогли найти погоду")
+		log.Printf("[ERROR] Не удалось получить погоду для координат (lat: %.2f, lon: %.2f): %v\n", coordinates.Lat, coordinates.Lon, err)
+		msg := tgbotapi.NewMessage(update.Message.Chat.ID, "Не смогли получить данные о погоде. Попробуйте позже.")
 		msg.ReplyToMessageID = update.Message.MessageID
 
 		h.bot.Send(msg)
@@ -101,8 +101,8 @@ func (h *Handler) handleCityCommand(update tgbotapi.Update) {
 }
 
 func (h *Handler) handleUnknownCommand(update tgbotapi.Update) {
-	log.Printf("Unknown command: [%s] %s", update.Message.From.UserName, update.Message.Text)
-	msg := tgbotapi.NewMessage(update.Message.Chat.ID, "Такая команда не поддерживается")
+	log.Printf("[WARNING] Неизвестная команда от пользователя @%s (ID: %d): '%s'\n", update.Message.From.UserName, update.Message.From.ID, update.Message.Text)
+	msg := tgbotapi.NewMessage(update.Message.Chat.ID, "Такая команда не поддерживается. Используйте /city или /weather")
 	msg.ReplyToMessageID = update.Message.MessageID
 	h.bot.Send(msg)
 }

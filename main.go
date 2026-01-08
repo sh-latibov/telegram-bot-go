@@ -13,22 +13,29 @@ import (
 func main() {
 	err := godotenv.Load()
 	if err != nil {
-		log.Fatal("Error loading .env file")
+		log.Printf("[WARNING] Ошибка загрузки файла .env: %v. Попытаюсь использовать переменные окружения системы.\n", err)
 	}
 
 	bot, err := tgbotapi.NewBotAPI(os.Getenv("BOT_TOKEN"))
 	if err != nil {
-		log.Panic(err)
+		log.Fatalf("[ERROR] Ошибка инициализации бота: %v. Убедитесь, что переменная BOT_TOKEN установлена и корректна.\n", err)
 	}
 
 	bot.Debug = true
 
-	log.Printf("Authorized on account %s", bot.Self.UserName)
+	log.Printf("[INFO] Бот успешно авторизован. Аккаунт: @%s (ID: %d)\n", bot.Self.UserName, bot.Self.ID)
 
-	owClient := openweather.New(os.Getenv("WEATHER_KEY"))
+	weatherKey := os.Getenv("WEATHER_KEY")
+	if weatherKey == "" {
+		log.Fatal("[ERROR] Переменная окружения WEATHER_KEY не установлена")
+	}
+	owClient := openweather.New(weatherKey)
+	log.Println("[INFO] OpenWeather клиент инициализирован")
 
 	botHandlaer := handler.New(bot, owClient)
+	log.Println("[INFO] Обработчик событий инициализирован")
 
+	log.Println("[INFO] Бот начал слушать входящие сообщения...")
 	botHandlaer.Start()
 
 }

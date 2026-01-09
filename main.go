@@ -1,10 +1,13 @@
 package main
 
 import (
+	"context"
+	"fmt"
 	"log"
 	"os"
 
 	tgbotapi "github.com/go-telegram-bot-api/telegram-bot-api/v5"
+	"github.com/jackc/pgx/v5"
 	"github.com/joho/godotenv"
 	"github.com/sh-latibov/telegram-bot-go/clients/openweather"
 	"github.com/sh-latibov/telegram-bot-go/handler"
@@ -14,6 +17,23 @@ func main() {
 	err := godotenv.Load()
 	if err != nil {
 		log.Printf("[WARNING] Ошибка загрузки файла .env: %v. Попытаюсь использовать переменные окружения системы.\n", err)
+	}
+
+	//dataBaseUrl := fmt.Sprintf("postgres://%s:%s@%s:%s/%s", os.Getenv("POSTGRES_USER"), os.Getenv("POSTGRES_PASSWORD"), os.Getenv("POSTGRES_HOST"), os.Getenv("POSTGRES_PORT"), os.Getenv("POSTGRES_DB"))
+	dataBaseUrl := "postgres://postgres:!Gitlerkaput1@47.84.200.125:5432/postgres"
+
+	conn, err := pgx.Connect(context.Background(), os.Getenv(dataBaseUrl))
+	if err != nil {
+		log.Fatalf("Unable to connect to database: %v\n", err)
+		fmt.Fprintf(os.Stderr, "Unable to connect to database: %v\n", err)
+		os.Exit(1)
+	}
+	defer conn.Close(context.Background())
+
+	err = conn.Ping(context.Background())
+	if err != nil {
+		log.Fatalf("Unable to connect to database: %v\n", err)
+		os.Exit(1)
 	}
 
 	bot, err := tgbotapi.NewBotAPI(os.Getenv("BOT_TOKEN"))

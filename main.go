@@ -19,15 +19,15 @@ func main() {
 		log.Printf("[WARNING] Ошибка загрузки файла .env: %v. Попытаюсь использовать переменные окружения системы.\n", err)
 	}
 
-	//dataBaseUrl := fmt.Sprintf("postgres://%s:%s@%s:%s/%s", os.Getenv("POSTGRES_USER"), os.Getenv("POSTGRES_PASSWORD"), os.Getenv("POSTGRES_HOST"), os.Getenv("POSTGRES_PORT"), os.Getenv("POSTGRES_DB"))
-	dataBaseUrl := "postgres://postgres:!Gitlerkaput1@47.84.200.125:5432/postgres"
+	dataBaseUrl := fmt.Sprintf("postgres://%s:%s@%s:%s/%s", os.Getenv("POSTGRES_USER"), os.Getenv("POSTGRES_PASSWORD"), os.Getenv("POSTGRES_HOST"), os.Getenv("POSTGRES_PORT"), os.Getenv("POSTGRES_DB"))
 
-	conn, err := pgx.Connect(context.Background(), os.Getenv(dataBaseUrl))
+	conn, err := pgx.Connect(context.Background(), dataBaseUrl)
 	if err != nil {
 		log.Fatalf("Unable to connect to database: %v\n", err)
 		fmt.Fprintf(os.Stderr, "Unable to connect to database: %v\n", err)
 		os.Exit(1)
 	}
+
 	defer conn.Close(context.Background())
 
 	err = conn.Ping(context.Background())

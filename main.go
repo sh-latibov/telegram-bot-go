@@ -11,6 +11,7 @@ import (
 	"github.com/joho/godotenv"
 	"github.com/sh-latibov/telegram-bot-go/clients/openweather"
 	"github.com/sh-latibov/telegram-bot-go/handler"
+	"github.com/sh-latibov/telegram-bot-go/repo"
 )
 
 func main() {
@@ -52,7 +53,9 @@ func main() {
 	owClient := openweather.New(weatherKey)
 	log.Println("[INFO] OpenWeather клиент инициализирован")
 
-	botHandlaer := handler.New(bot, owClient)
+	userRepo := repo.New(conn)
+
+	botHandlaer := handler.New(bot, owClient, userRepo)
 	log.Println("[INFO] Обработчик событий инициализирован")
 
 	log.Println("[INFO] Бот начал слушать входящие сообщения...")

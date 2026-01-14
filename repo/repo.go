@@ -13,6 +13,11 @@ type Repo struct {
 	db *pgx.Conn
 }
 
+func (r *Repo) IsUserExists(ctx context.Context, userID int64) (bool, error) {
+	//TODO implement me
+	panic("implement me")
+}
+
 func New(db *pgx.Conn) *Repo {
 	return &Repo{db: db}
 }
@@ -25,7 +30,7 @@ func New(db *pgx.Conn) *Repo {
 func (r *Repo) GetUserCity(ctx context.Context, userID int64) (string, error) {
 	var city string
 
-	row := r.db.QueryRow(ctx, "select city from users where userID=$1", userID)
+	row := r.db.QueryRow(ctx, "select coalesce(city, '') from users where id=$1", userID)
 	err := row.Scan(&city)
 	if err != nil {
 		return "", fmt.Errorf("error row.Scan: %w", err)
@@ -34,7 +39,7 @@ func (r *Repo) GetUserCity(ctx context.Context, userID int64) (string, error) {
 	return city, nil
 }
 
-func (r *Repo) SaveUserCity(ctx context.Context, userId int64) error {
+func (r *Repo) SaveUser(ctx context.Context, userId int64) error {
 	_, err := r.db.Exec(ctx, "insert into users (id) values($1)", userId)
 
 	if err != nil {
@@ -55,7 +60,7 @@ func (r *Repo) UpdateUserCity(ctx context.Context, userID int64, city string) er
 
 func (r *Repo) GetUser(ctx context.Context, userID int64) (*models.User, error) {
 	user := models.User{}
-	row := r.db.QueryRow(ctx, "select * from users where id=$1", userID)
+	row := r.db.QueryRow(ctx, "select id, coalesce(city, ''), created_at from users where id=$1", userID)
 	err := row.Scan(&user.ID, &user.City, &user.CreatedAt)
 	if err != nil {
 		if errors.Is(err, pgx.ErrNoRows) {

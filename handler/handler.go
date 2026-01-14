@@ -13,7 +13,7 @@ import (
 
 type userRepository interface {
 	SaveUser(ctx context.Context, userID int64) error
-	SaveUserCity(ctx context.Context, userID int64, city string) error
+	//SaveUserCity(ctx context.Context, userID int64, city string) error
 	GetUserCity(ctx context.Context, userID int64) (string, error)
 	UpdateUserCity(ctx context.Context, userID int64, city string) error
 	GetUser(ctx context.Context, userID int64) (*models.User, error)
@@ -58,6 +58,12 @@ func (h *Handler) handleUpdate(update tgbotapi.Update) {
 			return
 		case "weather":
 			h.handleWeatherCommand(ctx, update)
+			return
+		case "help":
+			h.handleHelp(ctx, update)
+			return
+		case "start":
+			h.handleHelp(ctx, update)
 			return
 		default:
 			h.handleUnknownCommand(update)
@@ -164,4 +170,32 @@ func (h *Handler) ensureUser(ctx context.Context, update tgbotapi.Update) error 
 		}
 	}
 	return nil
+}
+
+func (h *Handler) handleHelp(ctx context.Context, update tgbotapi.Update) {
+	helpText := `📋 *Доступные команды:*
+
+	/start - Начать работу с ботом
+	/help - Показать список команд
+	/weather - Получить прогноз погоды
+	/city - Установить город
+	/settings - Настройки`
+
+	msg := tgbotapi.NewMessage(update.Message.Chat.ID, helpText)
+	msg.ParseMode = "Markdown"
+	h.bot.Send(msg)
+}
+
+func (h *Handler) SetCommands() error {
+	commands := []tgbotapi.BotCommand{
+		{Command: "start", Description: "Начать работу с ботом"},
+		{Command: "help", Description: "Показать список команд"},
+		{Command: "weather", Description: "Получить прогноз погоды"},
+		{Command: "city", Description: "Установить город"},
+		{Command: "settings", Description: "Настройки"},
+	}
+
+	cfg := tgbotapi.NewSetMyCommands(commands...)
+	_, err := h.bot.Request(cfg)
+	return err
 }

@@ -59,6 +59,10 @@ func main() {
 	log.Println("[INFO] Обработчик событий инициализирован")
 
 	log.Println("[INFO] Бот начал слушать входящие сообщения...")
+
+	if err := botHandlaer.SetCommands(); err != nil {
+		log.Printf("Ошибка установки команд: %v", err)
+	}
 	botHandlaer.Start()
 
 }

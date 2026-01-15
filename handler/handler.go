@@ -13,7 +13,7 @@ import (
 
 type userRepository interface {
 	SaveUser(ctx context.Context, userID int64) error
-	//SaveUserCity(ctx context.Context, userID int64, city string) error
+	SaveUserCity(ctx context.Context, userID int64, city string) error
 	GetUserCity(ctx context.Context, userID int64) (string, error)
 	UpdateUserCity(ctx context.Context, userID int64, city string) error
 	GetUser(ctx context.Context, userID int64) (*models.User, error)

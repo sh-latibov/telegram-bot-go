@@ -41,7 +41,6 @@ func (r *Repo) GetUserCity(ctx context.Context, userID int64) (string, error) {
 
 func (r *Repo) SaveUser(ctx context.Context, userId int64) error {
 	_, err := r.db.Exec(ctx, "insert into users (id) values($1)", userId)
-
 	if err != nil {
 		return fmt.Errorf("error saving user city: %w", err)
 	}

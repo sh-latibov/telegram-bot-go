@@ -158,7 +158,6 @@ func (h *Handler) handleUnknownCommand(update tgbotapi.Update) {
 func (h *Handler) ensureUser(ctx context.Context, update tgbotapi.Update) error {
 	user, err := h.userRepo.GetUser(ctx, update.Message.From.ID)
 	if err != nil {
-
 		return fmt.Errorf("error getting user: %w", err)
 	}
 

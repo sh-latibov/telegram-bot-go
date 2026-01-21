@@ -30,8 +30,13 @@ func New(db *pgx.Conn) *Repo {
 func (r *Repo) GetUserCity(ctx context.Context, userID int64) (string, error) {
 	var city string
 
-	row := r.db.QueryRow(ctx, "select coalesce(city, '') from users where id=$1", userID)
-	err := row.Scan(&city)
+	rows, err := r.db.Query(ctx, "select * from user_cities where user_id=$1", userID)
+	if err != nil {
+		return "", fmt.Errorf("error querying user city: %w", err)
+	}
+	defer rows.Close()
+
+	fmt.Sprintln(rows)
 	if err != nil {
 		return "", fmt.Errorf("error row.Scan: %w", err)
 	}
@@ -68,4 +73,16 @@ func (r *Repo) GetUser(ctx context.Context, userID int64) (*models.User, error) 
 		return nil, fmt.Errorf("error row.Scan: %w", err)
 	}
 	return &user, nil
+}
+
+func (r *Repo) SaveUserCity(ctx context.Context, userID int64, city string) error {
+	_, err := r.db.Exec(ctx, `
+		INSERT INTO user_cities (user_id, city)
+		VALUES ($1, $2)
+		ON CONFLICT (user_id, city) DO NOTHING
+	`, userID, city)
+	if err != nil {
+		return fmt.Errorf("save user city: %w", err)
+	}
+	return nil
 }
